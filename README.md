@@ -386,3 +386,246 @@
 - We have launched the bastion host. It is initializing, let us wait for it to pass the “2/2 checks”
 
 <img width="1614" height="304" alt="Screenshot 2026-10-04 at 1 07 45 PM" src="https://github.com/user-attachments/assets/ab4780c1-bd2e-463e-ba45-bd54a70d1894" />
+
+### Create App Servers
+- We will now launch two EC2 instances that will serve as our two App servers.
+
+### Create First app server
+- Let us created the first app server for App tier. For this we have to create another EC2 instance.
+- Click on “Launch Instance”
+- We will call the instance “app-server-1”
+- On “AMI” select “Amazon Linux”
+- Scroll down to “Instance Type” and select “t2.micro”
+- Scroll down to “Key Pair”
+- Click on the drop down and select the key pair we created previously “three-tier-key”
+- Scroll down to “Network Settings”
+- Click on “Edit”
+- Click on the drop down on “VPC” and select our created VPC
+- Then we will use the public subnet “Private-app-subnet-AZ1”
+- On “Auto-assign public IP” we will leave it as “Disable”
+- Choose “Create security group”
+- Let us give the security group a name. We will call it “app-server-sg”
+- Then on “Description – required” enter the name of the security group “app-server-sg”
+- We will allow the SSH connection to this app server only from the “bastion-host”. So, the source will be the security group of the “bastion-host”, that is bastion-host-sg. Click on the drop down on “Source Type”.
+- Select “Custom”
+- Click on Source
+- Select “bastion-host-sg”.
+- Scroll down to the end
+- Click on “Launch Instance"
+- Click on “Instances”
+- We have launched the app server. It is initializing, let us wait for it to pass the “2/2 checks”
+- It has passed the “2/2 check”.
+
+
+### Create second app server
+- We have to launch the second EC2 instance that will serve as our second app server.
+- Click on “Launch Instance”
+- We will call the instance “app-server-2”
+- On “AMI” select “Amazon Linux"
+- Scroll down to “Instance Type” and select “t2.micro”
+- Scroll down to “Key Pair”
+- Click on the drop down and select the key pair we created previously “three-tier-key”
+- Scroll down to “Network Settings”
+- Click on “Edit”
+- Click on the drop down on “VPC” and select our created VPC
+- Then we will use the private subnet “private-app-subnet-AZ2”
+- On “Auto-assign public IP” we will leave it as “Disable”
+- Choose “Select Existing security group”
+- Click on the drop down on “Common Security Groups” and select “app-server-sg”
+- Scroll down to the end
+- Click on “Launch Instance”
+- Click on “Instances”
+- We have launched the “app-server-2”. It is initializing, let us wait for it to pass the “2/2 checks”
+- It has passed the “2/2 check”.
+
+
+### Connecting to the servers
+- Let us now connect to our servers. We will connect to the Bastion host and through the Bastion host, we will connect to the app servers.
+
+### Connecting to the Bastion Host
+- Let us first connect to the “bastion-host
+- Select the “bastion-host”
+- Copy the “Public IPv4 address”
+- Open terminal and navigate to where the key pair file is saved. It is saved in my “Downloads” folder. So, I will run the command:
+```bash
+cd Downloads
+ssh -i three-tier-key.pem ec2-user@3.238.53.122
+```
+- We are now connected to the bastion host.
+
+### Connecting “app-server-1” through the Bastion host
+- Let us connect to the first app server now. We have to use the private IP address of the first app server.
+- Firstly, check if the private key has been copied to your Bastion host using the command:
+```bash
+cd home/ec2-user
+ls
+```
+- There is no private key found on the Jump Server. If it has not been copied, exit the Jump server using the command:
+```bash
+exit
+```
+
+- We have to copy the private key to your Jump Sever using the command:
+```bash
+scp -i three-tier-key.pem three-tier-key.pem ec2-user@<BASTION_PUBLIC_IP>:/home/ec2-user/
+```
+- Then connect to your Bastion host again using the command:
+```bash
+ssh -i <Name of private>.pem ec2-user@<Public IP address of Bastion Host>
+```
+- Check again if the private key has been copied to your Bastion host using the command:
+```bash
+cd /home/ec2-user
+ls
+```
+- You can see that the private key has been copied to the Bastion host. The next thing is to change the mode of the private key pair file to read only using the command:
+```bash
+chmod 400 <Name of private Key>.pem
+ls -l
+```
+- You can see that it is read only. We have to use the private IP address of the first app server.
+- Copy the private IPv4 address of the server:
+- Run the command to connect to the private EC2 instance
+```bash
+ssh -i <Name of private>.pem ec2-user@<Private IP address of Private EC2 instance>
+```
+- You can see that we are now connected to the first PHP server.
+
+### Connecting “app-server-2” through the Bastion host
+- Let us connect to the second app server now. We have to use the private IP address of the second app server.
+- Firstly, we will duplicate the terminal window
+- Navigate to where our private key file is saved:
+```bash
+cd Downloads
+```
+- Run the command to connect to the Bastion host:
+```bash
+ssh -i <Name of private>.pem ec2-user@<Public IP address of Bastion Host>
+```
+- Check again if the private key has been copied to your Bastion host using the command:
+```bash
+cd /home/ec2-user
+ls
+```
+- The private key found on the Bastion host. We have to use the private IP address of the second app server.
+- Copy the private IPv4 address of the server:
+- Run the command to connect to the private EC2 instance
+```bash
+ssh -i <Name of private>.pem ec2-user@<Private IP address of app server 2>
+```
+- You can see that we are now connected to the second app server.
+
+### Install PHP on app servers
+- We are going to install PHP on the two app servers.
+- Install PHP on First app server
+- On the terminal, run the command to update the installed packages on your server:
+```bash
+sudo dnf upgrade -y
+```
+- Run the command to Install the lamp-mariadb10.2-phph7.2 and php7.2 Amazon Linux Extras repositories to the latest versions of the LAMP MariaDB and PHP:
+```bash
+sudo dnf install -y httpd wget php php-fpm php-mysqli php-json php-devel php-mbstring php-xml
+```
+- Php has been installed.
+
+### Install Apache on First app server
+- We will now run the command to install Apache server:
+```bash
+udo dnf install -y httpd
+```
+- Apache has been installed. Run the command to start the Apache server:
+```bash
+sudo systemctl start httpd
+```
+- We will run the command to enable it to start automatically after reboot:
+```bash
+sudo systemctl enable httpd
+```
+- Run the command to confirm that Apache has been installed:
+```bash
+sudo systemctl is-enabled httpd
+```
+- You can see it has been “Enabled”. You can verify that httpd is on by running the following command:
+```bash
+sudo systemctl status httpd
+```
+- Let us check whether the httpd service is working:
+```bash
+curl http://localhost
+```
+- It is working. Add your user (in this case, ec2-user) to the Apache group:
+```bash
+sudo usermod -a -G apache ec2-user
+```
+- Log out and then log in back again to pick u the new group, and then verify your membership. To log out (use the exit command or close the terminal window)
+```bash
+exit
+```
+- Then reconnect to our first app server using the command:
+```bash
+ssh -i three-tier-key.pem ec2-user@10.0.3.145
+```
+- I have reconnected to our first app server.
+- Change the group ownership of /var/www and its contents to the Apache group:
+```bash
+sudo chown -R ec2-user:apache /var/www
+```
+- To add group, write permissions and to set the group ID on future subdirectories, change the directory permissions of /var/www and its subdirectories:
+```bash
+sudo chmod 2775 /var/www && find /var/www -type d -exec sudo chmod 2775 {} \;
+```
+- To add group, write permissions, recursively change the file permissions of /var/www and its subdirectories:
+```bash
+find /var/www -type f -exec sudo chmod 0664 {} \;
+```
+
+### Install Apache on Second app server
+- We will now run the command to install Apache server
+```bash
+sudo dnf install -y httpd
+```
+- Apache has been installed. Run the command to start the Apache server:
+```bash
+sudo systemctl start httpd
+```
+- We will run the command to enable it to start automatically after reboot:
+```bash
+sudo systemctl enable httpd
+```
+- Run the command to confirm that Apache has been installed:
+```bash
+sudo systemctl is-enabled httpd
+```
+- You can see it has been “Enabled”. You can verify that httpd is on by running the following command:
+```bash
+sudo systemctl status httpd
+```
+- Let us check whether the httpd service is working:
+```bash
+curl http://localhost
+```
+- It is working. Add your user (in this case, ec2-user) to the Apache group:
+```bash
+sudo usermod -a -G apache ec2-user
+```
+- Log out and then log in back again to pick up the new group, and then verify your membership. To log out (use the exit command or close the terminal window)
+```bash
+exit
+```
+- We will reconnect to our second app server using the command:
+```bash
+ssh -i <Name of private>.pem ec2-user@<Private IP address of app server 2>
+```
+- I have reconnected to our second app server.
+- Change the group ownership of /var/www and its contents to the Apache group:
+```bash
+sudo chown -R ec2-user:apache /var/www
+```
+- To add group, write permissions and to set the group ID on future subdirectories, change the directory permissions of /var/www and its subdirectories:
+```bash
+sudo chmod 2775 /var/www && find /var/www -type d -exec sudo chmod 2775 {} \;
+```
+- To add group, write permissions, recursively change the file permissions of /var/www and its subdirectories:
+```bash
+find /var/www -type f -exec sudo chmod 0664 {} \;
+```
