@@ -416,6 +416,7 @@
 - We have launched the app server. It is initializing, let us wait for it to pass the “2/2 checks”
 - It has passed the “2/2 check”.
 
+<img width="1602" height="361" alt="Screenshot 2026-10-04 at 5 11 32 PM" src="https://github.com/user-attachments/assets/cc463ee1-fcaf-4cca-9bff-374a69d3cbd4" />
 
 ### Create second app server
 - We have to launch the second EC2 instance that will serve as our second app server.
@@ -438,6 +439,7 @@
 - We have launched the “app-server-2”. It is initializing, let us wait for it to pass the “2/2 checks”
 - It has passed the “2/2 check”.
 
+<img width="1585" height="209" alt="Screenshot 2026-10-04 at 5 13 30 PM" src="https://github.com/user-attachments/assets/be49fa84-82af-4c6c-b8f8-abd942866abe" />
 
 ### Connecting to the servers
 - Let us now connect to our servers. We will connect to the Bastion host and through the Bastion host, we will connect to the app servers.
@@ -452,6 +454,8 @@ cd Downloads
 ssh -i three-tier-key.pem ec2-user@3.238.53.122
 ```
 - We are now connected to the bastion host.
+
+<img width="716" height="333" alt="Screenshot 2026-10-04 at 5 14 54 PM" src="https://github.com/user-attachments/assets/204f6c4b-e469-40d4-9856-f9113a683e9f" />
 
 ### Connecting “app-server-1” through the Bastion host
 - Let us connect to the first app server now. We have to use the private IP address of the first app server.
@@ -478,17 +482,26 @@ ssh -i <Name of private>.pem ec2-user@<Public IP address of Bastion Host>
 cd /home/ec2-user
 ls
 ```
+
+<img width="1295" height="356" alt="Screenshot 2026-10-04 at 5 17 42 PM" src="https://github.com/user-attachments/assets/41542d97-4784-49a3-9e6b-84041991880e" />
+
 - You can see that the private key has been copied to the Bastion host. The next thing is to change the mode of the private key pair file to read only using the command:
 ```bash
 chmod 400 <Name of private Key>.pem
 ls -l
 ```
+
+<img width="672" height="131" alt="Screenshot 2026-10-04 at 5 18 38 PM" src="https://github.com/user-attachments/assets/56d7c606-b9fa-4ebc-9c25-94a755e6f589" />
+
 - You can see that it is read only. We have to use the private IP address of the first app server.
 - Copy the private IPv4 address of the server:
 - Run the command to connect to the private EC2 instance
 ```bash
 ssh -i <Name of private>.pem ec2-user@<Private IP address of Private EC2 instance>
 ```
+
+<img width="825" height="352" alt="Screenshot 2026-10-04 at 5 20 14 PM" src="https://github.com/user-attachments/assets/78e91fee-fda6-4788-95b6-e2e0119eff0f" />
+
 - You can see that we are now connected to the first PHP server.
 
 ### Connecting “app-server-2” through the Bastion host
@@ -507,12 +520,18 @@ ssh -i <Name of private>.pem ec2-user@<Public IP address of Bastion Host>
 cd /home/ec2-user
 ls
 ```
+
+<img width="819" height="300" alt="Screenshot 2026-10-04 at 5 22 13 PM" src="https://github.com/user-attachments/assets/fef520b9-cdd6-4ccc-a150-f8186f4c278e" />
+
 - The private key found on the Bastion host. We have to use the private IP address of the second app server.
 - Copy the private IPv4 address of the server:
 - Run the command to connect to the private EC2 instance
 ```bash
 ssh -i <Name of private>.pem ec2-user@<Private IP address of app server 2>
 ```
+
+<img width="788" height="326" alt="Screenshot 2026-10-04 at 5 23 10 PM" src="https://github.com/user-attachments/assets/9890daa8-de98-4c57-b9f3-b0700ff829dd" />
+
 - You can see that we are now connected to the second app server.
 
 ### Install PHP on app servers
@@ -526,13 +545,19 @@ sudo dnf upgrade -y
 ```bash
 sudo dnf install -y httpd wget php php-fpm php-mysqli php-json php-devel php-mbstring php-xml
 ```
+
+<img width="1354" height="131" alt="Screenshot 2026-10-04 at 5 25 04 PM" src="https://github.com/user-attachments/assets/89762157-11d7-4d98-813c-895ef7eb9e74" />
+
 - Php has been installed.
 
 ### Install Apache on First app server
 - We will now run the command to install Apache server:
 ```bash
-udo dnf install -y httpd
+sudo dnf install -y httpd
 ```
+
+<img width="1339" height="221" alt="Screenshot 2026-10-04 at 5 26 11 PM" src="https://github.com/user-attachments/assets/ccb7f92a-cc91-4b0e-8374-511d80a3e8fa" />
+
 - Apache has been installed. Run the command to start the Apache server:
 ```bash
 sudo systemctl start httpd
@@ -553,6 +578,9 @@ sudo systemctl status httpd
 ```bash
 curl http://localhost
 ```
+
+<img width="853" height="219" alt="Screenshot 2026-10-04 at 5 27 21 PM" src="https://github.com/user-attachments/assets/6e59be6a-855e-43f2-8054-dea56c825b09" />
+
 - It is working. Add your user (in this case, ec2-user) to the Apache group:
 ```bash
 sudo usermod -a -G apache ec2-user
@@ -579,6 +607,8 @@ sudo chmod 2775 /var/www && find /var/www -type d -exec sudo chmod 2775 {} \;
 find /var/www -type f -exec sudo chmod 0664 {} \;
 ```
 
+<img width="1023" height="111" alt="Screenshot 2026-10-04 at 5 29 01 PM" src="https://github.com/user-attachments/assets/b17d8ff2-e8e0-4a06-9450-5dbd4eda1217" />
+
 ### Install Apache on Second app server
 - We will now run the command to install Apache server
 ```bash
@@ -600,10 +630,16 @@ sudo systemctl is-enabled httpd
 ```bash
 sudo systemctl status httpd
 ```
+
+<img width="967" height="410" alt="Screenshot 2026-10-04 at 5 30 29 PM" src="https://github.com/user-attachments/assets/053dd066-557d-4041-8bd4-08148914620e" />
+
 - Let us check whether the httpd service is working:
 ```bash
 curl http://localhost
 ```
+
+<img width="839" height="269" alt="Screenshot 2026-10-04 at 5 31 00 PM" src="https://github.com/user-attachments/assets/d34c753a-d2e8-42c0-8935-c3afcf097fce" />
+
 - It is working. Add your user (in this case, ec2-user) to the Apache group:
 ```bash
 sudo usermod -a -G apache ec2-user
@@ -637,6 +673,9 @@ find /var/www -type f -exec sudo chmod 0664 {} \;
 ```bash
 sudo dnf install -y php-mbstring php-xml php-mysqlnd php-json php-gd php-zip
 ```
+
+<img width="1212" height="371" alt="Screenshot 2026-10-04 at 5 33 44 PM" src="https://github.com/user-attachments/assets/e8611e1a-7a34-4446-82ab-6704705ed145" />
+
 - Run the command to install wget:
 ```bash
 sudo dnf install -y wget
@@ -679,6 +718,9 @@ rm phpMyAdmin-latest-all-languages.tar.gz
 ```bash
 ls
 ```
+
+<img width="727" height="116" alt="Screenshot 2026-10-04 at 5 35 54 PM" src="https://github.com/user-attachments/assets/28c588cd-7b9c-45fd-9bd7-2180e6727a0c" />
+
 - You can see that the tar.gz file has been deleted
 - Now, we are done with the configuration of phpMyAdmin for the first app server. At a later stage when RDS is created, we will make certain changes to the config file.
 
@@ -688,6 +730,9 @@ ls
 ```bash
 sudo dnf install -y php-mbstring php-xml php-mysqlnd php-json php-gd php-zip
 ```
+
+<img width="1135" height="318" alt="Screenshot 2026-10-04 at 5 36 54 PM" src="https://github.com/user-attachments/assets/af33b9a9-98e8-469d-953c-339ee2374811" />
+
 - Run the command to install wget:
 ```bash
 sudo dnf install -y wget
@@ -730,6 +775,9 @@ rm phpMyAdmin-latest-all-languages.tar.gz
 ```bash
 ls
 ```
+
+<img width="779" height="149" alt="Screenshot 2026-10-04 at 5 38 22 PM" src="https://github.com/user-attachments/assets/0f075ab2-b78f-41f1-8c2b-b0bcbf2ad285" />
+
 - You can see that the tar.gz file has been deleted
 - Now, we are done with the configuration of phpMyAdmin for the second app server. At a later stage when RDS is created, we will make certain changes to the config file.
 
@@ -748,6 +796,9 @@ ls
 - Click on the drop down on “VPC” and select our created VPC
 - Then select all the three availability zones. That is “us-east-1a”, “us-east-1b” and “us-east-1c”
 - Make sure “Public-subnet-AZ1”, “Public-AZ2” and “Public-AZ3” as shown above.
+
+<img width="1899" height="685" alt="Screenshot 2026-10-04 at 5 41 55 PM" src="https://github.com/user-attachments/assets/b3d43ac4-ce47-41dc-9f40-a6b11a5c8d17" />
+
 - Scroll down to “Security Groups”
 - Remove the default security group and select the security group we created for the Frontend ALB.
 - Click on “Create security group”
@@ -761,6 +812,9 @@ ls
 - Scroll down to the end
 - Click on “Create Security Group”
 - The security group has been created. Head back to the creation of the load balancer
+
+<img width="1598" height="585" alt="Screenshot 2026-10-04 at 5 41 06 PM" src="https://github.com/user-attachments/assets/e710881f-c1a0-46b2-a624-352a294e4182" />
+
 - Remove the default security group
 - Then, click on the drop down
 - Select “my-alb-sg” we just created
@@ -772,15 +826,26 @@ ls
 - Click on “Create Target Group” and a new window will open
 - For “Target Type” will be “Instances”
 - We will name the Target group “my-alb-app-tg”
+
+<img width="1273" height="759" alt="Screenshot 2026-10-04 at 5 43 40 PM" src="https://github.com/user-attachments/assets/c21868ab-75a8-4592-94ec-740de5b41661" />
+
 - Scroll down to the end
 - Click on “Next”
 - We have to select the targets we want to register. Select “app-server-1” and “app-server-2”
+
+<img width="1530" height="460" alt="Screenshot 2026-10-04 at 5 44 22 PM" src="https://github.com/user-attachments/assets/c0750471-b2b7-4007-b3ba-a5fd372c46e6" />
+
 - Click on “Include as pending below”
+
+<img width="1488" height="438" alt="Screenshot 2026-10-04 at 5 45 08 PM" src="https://github.com/user-attachments/assets/c27d8a24-de73-4850-a42f-1aba6f180784" />
+
 - Scroll down to the end
 - Click on “Next” again
 - Scroll down
 - Then click on “Create Target Group”
 - We have created the Target Group.
+
+<img width="1590" height="714" alt="Screenshot 2026-10-04 at 5 45 43 PM" src="https://github.com/user-attachments/assets/afc1a56c-2c76-43b0-b7da-0791b7598363" />
 
 ### Add the Target Group to Application Load Balancer
 - Head back to our application load balancer page
@@ -790,6 +855,8 @@ ls
 - Then scroll down to the end
 - Click on “create load balancer”
 - We have created the load balancer for the App.
+
+<img width="1580" height="780" alt="Screenshot 2026-10-04 at 5 46 25 PM" src="https://github.com/user-attachments/assets/9cb4c301-eb7d-459f-806c-f7e7ed85ab4c" />
 
 ### Allow Load Balancer Security Group in App Server
 - By the time our instances are getting registered in the target group, we need to allow the load balancer security group in our App server security group. So, let us make the changes. Go back to our EC2 instances.
@@ -803,6 +870,8 @@ ls
 - Select the security group of the load balancer, that is “my-alb-sg”
 - Click on “Save rules
 - This will establish connectivity between the load balancer and the instances.
+
+<img width="1581" height="404" alt="Screenshot 2026-10-04 at 5 48 18 PM" src="https://github.com/user-attachments/assets/16ac535f-91fc-4155-ab55-faf67746f4ae" />
 
 ### Test the Load Balancer
 - We have to create an index.html file in the www.html folder in both app servers to validate if the requests are going to both app servers.
@@ -820,6 +889,8 @@ ls
 echo "My Server 2 is running" > index.html
 ls
 ```
+
+<img width="698" height="188" alt="Screenshot 2026-10-04 at 5 49 15 PM" src="https://github.com/user-attachments/assets/dde231f4-b375-450d-a468-7e85c235bc16" />
 
 ### For app server 1
 - Let us continue with the first app server.
@@ -842,13 +913,21 @@ ls
 echo "My Server 1 is running" > index.html
 ls
 ```
+
+<img width="735" height="175" alt="Screenshot 2026-10-04 at 5 50 23 PM" src="https://github.com/user-attachments/assets/56b20b92-16ea-496d-bb58-7958558ac88d" />
+
 - We have to test the load balancer using the DNS name
 - Click on “Load Balancers”
 - Select the load balancer
-- Copy the DNS name: my-alb-130448560.us-east-1.elb.amazonaws.com
+- Copy the DNS name:
 - Then, paste this on your browser:
 - We are able to see that our application load balancer is working. Then refresh the page and see if you will see the messages on both app server.
 - We can see that it is going to app server 1 and app server 2. So, the load balancer is working it is able to route the traffic between the two app servers.
+
+<img width="1128" height="133" alt="Screenshot 2026-10-04 at 5 51 23 PM" src="https://github.com/user-attachments/assets/c6ec588c-1cf1-45e9-a020-a261007042be" />
+
+<img width="993" height="148" alt="Screenshot 2026-10-04 at 5 53 15 PM" src="https://github.com/user-attachments/assets/896ddef3-6e39-4827-b44c-319eb029e550" />
+
 - So, now we have created two layers of the architecture. We will now create the third layer which is the database.
 
 ### Create RDS instance
@@ -871,39 +950,66 @@ ls
 - Click on “Create”
 - We have created the subnet group.
 
+<img width="1517" height="723" alt="Screenshot 2026-10-04 at 5 55 27 PM" src="https://github.com/user-attachments/assets/20329da5-06aa-4bff-9bc7-246a7c6a9d80" />
+
 ### Create database
 - Here we have to create the actual database.
 - Click on “Databases”
 - Click on “create database”
 - On “creation Method”, choose “Standard Create” and on “Engine Type”, choose “MySQL”
+
+<img width="1904" height="616" alt="Screenshot 2026-10-04 at 5 58 48 PM" src="https://github.com/user-attachments/assets/1f9ec6e2-2a84-421e-9b33-0183c84b5649" />
+
 - Scroll down to “Templates” and select “Dev/Test”
 - Scroll down to “Availability and durability”, select “multi-AZ DB instance deployment (2 instances)” since in our architecture, we are using Multi-AZ.
+
+<img width="1852" height="819" alt="Screenshot 2026-10-04 at 5 59 19 PM" src="https://github.com/user-attachments/assets/06a267e3-d58a-427b-8ab9-c2818d8dfdd5" />
+
 - Scroll down to “Settings”
 - On “DB Instance Identifier”, we will give it the name “my-db”
+
+<img width="1779" height="721" alt="Screenshot 2026-10-04 at 5 59 50 PM" src="https://github.com/user-attachments/assets/eea67316-c0fc-4167-8989-d5477e371ffe" />
+
 - Scroll down
 - On “Master username”, we will leave it as “admin”,
 - And on “Credentials Management”, select “Self-Managed"
 - Then on “Master Password”, enter a password and confirm the password. I will use “IloveTexas1234” as password.
+
+<img width="1812" height="596" alt="Screenshot 2026-10-04 at 6 00 19 PM" src="https://github.com/user-attachments/assets/afeb7c04-5c5e-41ff-acef-90c75503b207" />
+
 - Scroll down to “Instance Configuration"
 - Select “Burstable classes (includes t classes)” and also select “db.t3.micro”
+
+<img width="1538" height="569" alt="Screenshot 2026-10-04 at 6 00 47 PM" src="https://github.com/user-attachments/assets/660fc3e8-98f7-4c9d-931b-32debc1518c7" />
+
 - Scroll down to “Storage”.
 - On “Storage Type”, select “General Purpose SSD (gp3)” and on “Allocated storage”, use “20” GiB.
 - Click on “Additional Storage Configuration”
 - Uncheck the box on “Enable storage autoscaling” since this is just a demo. But it is advisable to check this box when working on production.
+
+<img width="1723" height="796" alt="Screenshot 2026-10-04 at 6 01 13 PM" src="https://github.com/user-attachments/assets/d3bee9bc-8f50-4b3c-a163-6e22fa7331cc" />
+
 - Scroll down to “Connectivity”.
 - Remember we have created a security group and allowed access from the Backend server (app server) to the database server. So, we will leave “Compute Source” as default, that is “Don’t connect to an EC2 compute resource”
 - Click on the drop down on “Virtual Private Cloud (VPC)”, and select our VPC “three-tier-vpc”
 - Click on the drop down on “DB Subnet Group” and select our created subnet group “db-subnet-group”
 - or “Public Access”, we will select “No”
+
+<img width="1760" height="727" alt="Screenshot 2026-10-04 at 6 02 20 PM" src="https://github.com/user-attachments/assets/8b81d247-1479-4e84-88e7-91d92618746a" />
+
 - Scroll down to “VPC Security Group (Firewall)”
 - On “VPC Security group (firewall)”, select “Create New”
 - We have to create a security group for the database. We will call it “my-db-sg”
 - Click on “Additional Configuration”
+
+<img width="1730" height="706" alt="Screenshot 2026-10-04 at 6 03 19 PM" src="https://github.com/user-attachments/assets/c34b3944-f3fc-4c39-aefe-c9bd727210e2" />
+
 - On “Tag - Optional”, leave everything as default and scroll down to “Monitoring”.
 - Leave everything as default and scroll down to the end.
 - Click on “Create Database”
 - The database is being created. Wait for it to be created.
-- The database has been created
+
+<img width="1565" height="312" alt="Screenshot 2026-10-04 at 6 04 28 PM" src="https://github.com/user-attachments/assets/0f6b6f8a-96b2-437b-9894-e4c336ccf4b7" />
 
 ### Enable Connectivity between App Tier and Data Tier
 - Once the database is created, we have to enable connectivity between the app server and the database server. So, we have to go to the security group of the database.
@@ -919,6 +1025,8 @@ ls
 - Remember that the App Tier will be connecting to the Data Tier. So, we will select the security group of the App tier here. Select “app-server-sg” to enable communication between the database and the App servers.
 - And delete the default rule that was created.
 - Click on “Save Rules”
+
+<img width="1574" height="320" alt="Screenshot 2026-10-04 at 6 06 26 PM" src="https://github.com/user-attachments/assets/010bc80a-d526-4719-b7c0-bbbd4ab2a14c" />
 
 ### Configure phpMyAdmin with RDS
 - We have to configure the phpMyAdmin with the database. To do this, we have to go to the database.
@@ -957,10 +1065,16 @@ vi config.inc.php
 my-db.cu726k462mpf.us-east-1.rds.amazonaws.com
 ```
 - Save the file by pressing “ESC” followed by “:wq” and press “enter”
+
+<img width="845" height="254" alt="Screenshot 2026-10-04 at 6 14 45 PM" src="https://github.com/user-attachments/assets/b8176ec6-1915-465a-a7d3-affcffeb7347" />
+
 - Then, go to the browser and paste the DNS name of the load balancer followed by phpMyAdmin:
 ```bash
 my-alb-130448560.us-east-1.elb.amazonaws.com/phpMyAdmin
 ```
+
+<img width="1738" height="612" alt="Screenshot 2026-10-04 at 6 16 21 PM" src="https://github.com/user-attachments/assets/b8da1678-0da0-45f9-81f1-d6b89fb853c6" />
+
 - We can successfully access the sample PHP app
 
 ### Configure session stickiness
@@ -974,6 +1088,8 @@ my-alb-130448560.us-east-1.elb.amazonaws.com/phpMyAdmin
 - Click on “Save Changes”
 - We have configured the session stickiness.
 
+<img width="1282" height="478" alt="Screenshot 2026-10-04 at 6 17 59 PM" src="https://github.com/user-attachments/assets/5a2f3765-8281-4cbe-9551-f39202bcbd3e" />
+
 ### Final Test
 - Now, we will try to log in to the sample PHP App using the username and password used when creating the Database.
 ```bash
@@ -982,6 +1098,9 @@ http://my-alb-130448560.us-east-1.elb.amazonaws.com/phpMyAdmin/index.php
 - Enter the Username: admin
 - Enter the Password: IloveTexas1234
 - Click on “Log in”
+
+<img width="669" height="390" alt="Screenshot 2026-10-04 at 6 21 12 PM" src="https://github.com/user-attachments/assets/8617e76b-f88a-408c-b681-8adcd4aa925b" />
+
 - We are able to log in to the sample application. The load balancer will be able to distribute incoming traffic evenly to the application servers. This will make the system to be able to handle a large volume of requests without overloading any individual server.
 - The application servers are responsible for running the PHP codes and communicating with the database server to fetch and manipulate data.
 - The database server stores the data and provides a way for the application servers to retrieve and modify data.
