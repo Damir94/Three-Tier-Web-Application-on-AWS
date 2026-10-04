@@ -629,3 +629,362 @@ sudo chmod 2775 /var/www && find /var/www -type d -exec sudo chmod 2775 {} \;
 ```bash
 find /var/www -type f -exec sudo chmod 0664 {} \;
 ```
+### Install phpMyAdmin on the app servers
+- Let us install phpMyAdmin which is a simple web application on the two app servers.
+
+### Install phpMyAdmin on the first app server
+- We will start by installing the required dependencies.
+```bash
+sudo dnf install -y php-mbstring php-xml php-mysqlnd php-json php-gd php-zip
+```
+- Run the command to install wget:
+```bash
+sudo dnf install -y wget
+```
+- Run the command to Restart Apache:
+```bash
+sudo systemctl restart httpd
+```
+- Run the command to Restart php-fpm:
+```bash
+sudo systemctl restart php-fpm
+```
+- Run the command to navigate to the Apache document root at /var/www/html
+```bash
+cd /var/www/html
+ls
+```
+- You can see that it is empty.
+- To download the file directly to your instance, copy the link and paste it into a wget command, as in this example:
+```bash
+wget https://www.phpmyadmin.net/downloads/phpMyAdmin-latest-all-languages.tar.gz
+```
+- Run the command to check the content:
+```bash
+ls -lh
+```
+- Create a phpMyAdmin folder and extract the package into it with the following command.
+```bash
+mkdir phpMyAdmin && tar -xvzf phpMyAdmin-latest-all-languages.tar.gz -C phpMyAdmin --strip-components 1
+```
+- Run the command:
+```bash
+ls
+```
+- You can see the folder we have created. Run the command to Delete the phpMyAdmin-latest-alllanguages.tar.gz tarball:
+```bash
+rm phpMyAdmin-latest-all-languages.tar.gz
+```
+- Run the command:
+```bash
+ls
+```
+- You can see that the tar.gz file has been deleted
+- Now, we are done with the configuration of phpMyAdmin for the first app server. At a later stage when RDS is created, we will make certain changes to the config file.
+
+### Install phpMyAdmin on the second app server
+- Let us install phpMyAdmin which is a simple web application following the steps below
+- - We will start by installing the required dependencies.
+```bash
+sudo dnf install -y php-mbstring php-xml php-mysqlnd php-json php-gd php-zip
+```
+- Run the command to install wget:
+```bash
+sudo dnf install -y wget
+```
+- Run the command to Restart Apache:
+```bash
+sudo systemctl restart httpd
+```
+- Run the command to Restart php-fpm:
+```bash
+sudo systemctl restart php-fpm
+```
+- Run the command to navigate to the Apache document root at /var/www/html
+```bash
+cd /var/www/html
+ls
+```
+- You can see that it is empty.
+- To download the file directly to your instance, copy the link and paste it into a wget command, as in this example:
+```bash
+wget https://www.phpmyadmin.net/downloads/phpMyAdmin-latest-all-languages.tar.gz
+```
+- Run the command to check the content:
+```bash
+ls -lh
+```
+- Create a phpMyAdmin folder and extract the package into it with the following command.
+```bash
+mkdir phpMyAdmin && tar -xvzf phpMyAdmin-latest-all-languages.tar.gz -C phpMyAdmin --strip-components 1
+```
+- Run the command:
+```bash
+ls
+```
+- You can see the folder we have created. Run the command to Delete the phpMyAdmin-latest-alllanguages.tar.gz tarball:
+```bash
+rm phpMyAdmin-latest-all-languages.tar.gz
+```
+- Run the command:
+```bash
+ls
+```
+- You can see that the tar.gz file has been deleted
+- Now, we are done with the configuration of phpMyAdmin for the second app server. At a later stage when RDS is created, we will make certain changes to the config file.
+
+### Create and configure an application load balancer
+- We will now create the load balancer. We need a load balancer because we have two app servers running, so load balancer will help distribute traffic across these two servers running. The load balancer will also help in scalability.
+- We will create load balancer for the public subnet and the private subnets.
+
+### Create Load Balancer for Web Tier
+- Let us create the load balancer for the public subnet. Go back to AWS Management console
+- Click on “Load Balancers”
+- Click on “Create Load Balancer”
+- Click on “Create” under “Application Load Balancer”
+- We will give the load balancer the name “my-alb”
+- For the “Scheme”, we will use “Internet Facing” because we want to expose this load balancer to outside world (internet).
+- Scroll down to “Network Mapping”
+- Click on the drop down on “VPC” and select our created VPC
+- Then select all the three availability zones. That is “us-east-1a”, “us-east-1b” and “us-east-1c”
+- Make sure “Public-subnet-AZ1”, “Public-AZ2” and “Public-AZ3” as shown above.
+- Scroll down to “Security Groups”
+- Remove the default security group and select the security group we created for the Frontend ALB.
+- Click on “Create security group”
+- Give the security group a name, I will call it “my-alb-sg"
+- Then for “Description” enter the name of the security group
+- Click on the drop down on “VPC” and select our VPC.
+- Then, click on “Add Rule”
+- On “Port Range” enter “80”
+- On “Source”, click on the search
+- Select “0.0.0.0/0”
+- Scroll down to the end
+- Click on “Create Security Group”
+- The security group has been created. Head back to the creation of the load balancer
+- Remove the default security group
+- Then, click on the drop down
+- Select “my-alb-sg” we just created
+- Scroll down to “Listeners and Routing”
+- Next, we are going to create a target group. Click on “Create Target Group”
+
+### Create Target Group for Load Balancer
+- We have to create a target group that will house our target instances.
+- Click on “Create Target Group” and a new window will open
+- For “Target Type” will be “Instances”
+- We will name the Target group “my-alb-app-tg”
+- Scroll down to the end
+- Click on “Next”
+- We have to select the targets we want to register. Select “app-server-1” and “app-server-2”
+- Click on “Include as pending below”
+- Scroll down to the end
+- Click on “Next” again
+- Scroll down
+- Then click on “Create Target Group”
+- We have created the Target Group.
+
+### Add the Target Group to Application Load Balancer
+- Head back to our application load balancer page
+- Click on “Refresh”
+- Then click on the drop down on “Target Group
+- Select the target group we just created.
+- Then scroll down to the end
+- Click on “create load balancer”
+- We have created the load balancer for the App.
+
+### Allow Load Balancer Security Group in App Server
+- By the time our instances are getting registered in the target group, we need to allow the load balancer security group in our App server security group. So, let us make the changes. Go back to our EC2 instances.
+- Select “app-server-1”
+- Click on “Security” tab
+- Click on the security group url
+- Click on “Edit Inbound Rules”
+- We have to add a new rule to establish connection between the load balancer and “app-server-1”. Click on “Add Rule”
+- On “Port Range”, enter “80”
+- On “Source”, click on the search
+- Select the security group of the load balancer, that is “my-alb-sg”
+- Click on “Save rules
+- This will establish connectivity between the load balancer and the instances.
+
+### Test the Load Balancer
+- We have to create an index.html file in the www.html folder in both app servers to validate if the requests are going to both app servers.
+
+## For app server 2
+- Let is start with the second app server.
+- Head back to our terminal window where we are connected to app-server-2.
+- Run the command:
+```bash
+cd /var/www/html
+ls
+```
+- Then put a sample text in the index.html file using the command:
+```bash
+echo "My Server 2 is running" > index.html
+ls
+```
+
+### For app server 1
+- Let us continue with the first app server.
+- Head back to our terminal window where we are connected to app-server-2.
+- Exit the terminal to take us to the connected Bastion host:
+```bash
+exit
+```
+- We are back to the connected Bastion host. Let us now connect to our app-server-1. Run the command:
+```bash
+ssh -i three-tier-key.pem ec2-user@10.0.3.145
+```
+- We are now connected to app-server-1. Run the command:
+```bash
+cd /var/www/html
+ls
+```
+- Then put a sample text in the index.html file using the command:
+```bash
+echo "My Server 1 is running" > index.html
+ls
+```
+- We have to test the load balancer using the DNS name
+- Click on “Load Balancers”
+- Select the load balancer
+- Copy the DNS name: my-alb-130448560.us-east-1.elb.amazonaws.com
+- Then, paste this on your browser:
+- We are able to see that our application load balancer is working. Then refresh the page and see if you will see the messages on both app server.
+- We can see that it is going to app server 1 and app server 2. So, the load balancer is working it is able to route the traffic between the two app servers.
+- So, now we have created two layers of the architecture. We will now create the third layer which is the database.
+
+### Create RDS instance
+- We are going to create the third layer of the architecture which is the database.
+
+### Create Database Subnet Group
+- We have to create the subnet group for RDS database. Go to AWS Management Console.
+- Search for “RDS”
+- Click on “RDS”
+- Click on “Subnet Groups"
+- Click on “Create DB subnet group”
+- Let us give the Subnet group a name. We will call it “db-subnet-group”
+- In the description, we will use the name of the subnet group details. That is “db-subnet-group”
+- Click on the drop down on “VPC” ad select our created VPC
+- Click on the drop down on “Availability Zones”
+- Select “us-east-1a”, “us-east-1b” and “us-east-1c”
+- Then click on the drop down on “Subnets”
+- Select the three database subnets
+- Scroll down
+- Click on “Create”
+- We have created the subnet group.
+
+### Create database
+- Here we have to create the actual database.
+- Click on “Databases”
+- Click on “create database”
+- On “creation Method”, choose “Standard Create” and on “Engine Type”, choose “MySQL”
+- Scroll down to “Templates” and select “Dev/Test”
+- Scroll down to “Availability and durability”, select “multi-AZ DB instance deployment (2 instances)” since in our architecture, we are using Multi-AZ.
+- Scroll down to “Settings”
+- On “DB Instance Identifier”, we will give it the name “my-db”
+- Scroll down
+- On “Master username”, we will leave it as “admin”,
+- And on “Credentials Management”, select “Self-Managed"
+- Then on “Master Password”, enter a password and confirm the password. I will use “IloveTexas1234” as password.
+- Scroll down to “Instance Configuration"
+- Select “Burstable classes (includes t classes)” and also select “db.t3.micro”
+- Scroll down to “Storage”.
+- On “Storage Type”, select “General Purpose SSD (gp3)” and on “Allocated storage”, use “20” GiB.
+- Click on “Additional Storage Configuration”
+- Uncheck the box on “Enable storage autoscaling” since this is just a demo. But it is advisable to check this box when working on production.
+- Scroll down to “Connectivity”.
+- Remember we have created a security group and allowed access from the Backend server (app server) to the database server. So, we will leave “Compute Source” as default, that is “Don’t connect to an EC2 compute resource”
+- Click on the drop down on “Virtual Private Cloud (VPC)”, and select our VPC “three-tier-vpc”
+- Click on the drop down on “DB Subnet Group” and select our created subnet group “db-subnet-group”
+- or “Public Access”, we will select “No”
+- Scroll down to “VPC Security Group (Firewall)”
+- On “VPC Security group (firewall)”, select “Create New”
+- We have to create a security group for the database. We will call it “my-db-sg”
+- Click on “Additional Configuration”
+- On “Tag - Optional”, leave everything as default and scroll down to “Monitoring”.
+- Leave everything as default and scroll down to the end.
+- Click on “Create Database”
+- The database is being created. Wait for it to be created.
+- The database has been created
+
+### Enable Connectivity between App Tier and Data Tier
+- Once the database is created, we have to enable connectivity between the app server and the database server. So, we have to go to the security group of the database.
+- The database has been created and its status is “modifying”. Wait for the status to be “Available”
+- The database is now available. Click on the database
+- Select “Endpoints”
+- Click on the VPC Security Group url
+- Click on the security group ID
+- Click on “Edit Inbound Rules”
+- We have to add one entry for the app server. Click on “Add Rule”
+- On “Port Range”, enter “3306”
+- Click on the search field near “Custom”
+- Remember that the App Tier will be connecting to the Data Tier. So, we will select the security group of the App tier here. Select “app-server-sg” to enable communication between the database and the App servers.
+- And delete the default rule that was created.
+- Click on “Save Rules”
+
+### Configure phpMyAdmin with RDS
+- We have to configure the phpMyAdmin with the database. To do this, we have to go to the database.
+- Copy the “Endpoint”
+- Go to connected first app server. If the connection has expired, we have to reconnect again.
+- To do this, we have to first connect to our Bastion host using the command:
+```bash
+ssh -i three-tier-key.pem ec2-user@3.238.53.122
+```
+- We are now connected to our Bastion host. Let us connect to the first App server using the command:
+```bash
+ssh -i three-tier-key.pem ec2-user@10.0.3.145
+```
+- We are now connected to our first App server. Run the command:
+```bash
+cd /var/www/html
+ls
+```
+- Then, switch directory to the phpMyAdmin folder using the command:
+```bash
+cd phpMyAdmin
+ls
+```
+- Let us rename the file “config.sample.inc.php” to “config.inc.php” by using the command:
+```bash
+mv config.sample.inc.php config.inc.php
+ls
+```
+- You can see that the file has been renamed. Now, let us open the file using the command:
+```bash
+vi config.inc.php
+```
+- Search for “host” in the file
+- Replace “localhost” with the hostname (endpoint) of the RDS instance we just created. That is:
+```bash
+my-db.cu726k462mpf.us-east-1.rds.amazonaws.com
+```
+- Save the file by pressing “ESC” followed by “:wq” and press “enter”
+- Then, go to the browser and paste the DNS name of the load balancer followed by phpMyAdmin:
+```bash
+my-alb-130448560.us-east-1.elb.amazonaws.com/phpMyAdmin
+```
+- We can successfully access the sample PHP app
+
+### Configure session stickiness
+- Before we go ahead to log in, we should enable stickiness. This means that when a client sends a request, and later come back to make the same request, stickiness will make the request to be sent to one particular target. So, all subsequent requests from that client will be routed to the same target unless the target becomes unavailable. Stickiness will be enabled from the target group. Go to “Target Groups” on AWS Console
+- Click on “Target Groups”
+- Select the target group
+- Click on the “Attributes” tab
+- Click on “Edit"
+- Scroll down to “Target selection configuration”
+- Check the box on “Turn on Stickiness”
+- Click on “Save Changes”
+- We have configured the session stickiness.
+
+### Final Test
+- Now, we will try to log in to the sample PHP App using the username and password used when creating the Database.
+```bash
+http://my-alb-130448560.us-east-1.elb.amazonaws.com/phpMyAdmin/index.php
+```
+- Enter the Username: admin
+- Enter the Password: IloveTexas1234
+- Click on “Log in”
+- We are able to log in to the sample application. The load balancer will be able to distribute incoming traffic evenly to the application servers. This will make the system to be able to handle a large volume of requests without overloading any individual server.
+- The application servers are responsible for running the PHP codes and communicating with the database server to fetch and manipulate data.
+- The database server stores the data and provides a way for the application servers to retrieve and modify data.
+
+### Services recap
+- We have made used of Bastion host and VPC that helps to limit access to our environment and provide secured entry pints for administrators. Overall, the architecture is created because it allows for scalability.
