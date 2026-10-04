@@ -1,5 +1,7 @@
 # How to Deploy a Three-Tier Web Application on AWS
 
+<img width="1517" height="1037" alt="ChatGPT Image Oct 4, 2026, 06_37_13 PM" src="https://github.com/user-attachments/assets/5359238d-4e7b-446f-9b37-24db2627c5a4" />
+
 - In this demo, we are going to deploy a three-tier web application in AWS. We will walk through the complete setup of a highly available three-tier architecture on AWS, perfect for modern web applications. The implementation includes creating a VPC with structured subnets, setting up public and private routing with IGW and NAT, deploying Application Load Balancers (ALBs), and launching scalable frontend and backend server groups. We will also configure a multi-AZ RDS database layer for data durability.
 
 - Services used:
